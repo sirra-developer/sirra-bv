@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+:root {
+  --background: white;
+  --foreground: #171717;
+  --sirra-green: #0b2719;
+  --sirra-taupe: #9a8a7a;
+  --sirra-taupe-light: #eee9e2;
+  --sirra-sand: #dfd4c4;
+  --sirra-accent: #c9a45c;
+  --sirra-gold: #c9a45c;
+  --sirra-ink: #10261d;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sirra-green: var(--sirra-green);
+  --color-sirra-taupe: var(--sirra-taupe);
+  --color-sirra-taupe-light: var(--sirra-taupe-light);
+  --color-sirra-sand: var(--sirra-sand);
+  --color-sirra-accent: var(--sirra-accent);
+  --color-sirra-gold: var(--sirra-gold);
+  --color-sirra-ink: var(--sirra-ink);
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "Courier New", monospace;
+}
+
+::selection {
+  background-color: var(--sirra-green);
+  color: white;
+}
+
+:where(.bg-sirra-green, .bg-sirra-green *)::selection {
+  background-color: var(--sirra-sand);
+  color: var(--sirra-green);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.eyebrow {
+  color: var(--sirra-taupe);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.section-title {
+  font-size: clamp(2rem, 3vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.fadeInUp {
+  animation: fadeInUp 1s 4s backwards;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fadeIn {
+  animation: fadeIn 1s 3s backwards;
+  opacity: 1;
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(-1rem);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+::view-transition-group(employee-content) {
+  animation-duration: 420ms;
+  animation-timing-function: ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
