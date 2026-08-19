@@ -6,7 +6,7 @@ export function HomeIntro({ content }: { content: HomePageContent }) {
       <div className="mx-auto max-w-6xl px-2 pt-12 pb-10 sm:px-6 sm:pt-16 sm:pb-12">
         <p
           data-animate-item
-          className="text-sirra-taupe flex items-center gap-3 text-[0.7rem] font-semibold tracking-[0.22em] uppercase"
+          className="text-sirra-taupe flex items-center gap-3 text-xs font-semibold tracking-[0.22em] uppercase"
         >
           <span className="bg-sirra-gold h-px w-9" />
           {content.eyebrow}
