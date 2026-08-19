@@ -1,0 +1,55 @@
+name: Back merge main to staging
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-back-merge-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check for existing pull request
+        id: existing-pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_COUNT=$(gh pr list \
+            --repo "${{ github.repository }}" \
+            --state open \
+            --base staging \
+            --head main \
+            --json number \
+            --jq 'length')
+
+          echo "count=$PR_COUNT" >> "$GITHUB_OUTPUT"
+
+      - name: Check for changes
+        id: changes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          STATUS=$(gh api \
+            "repos/${{ github.repository }}/compare/staging...main" \
+            --jq '.status')
+
+          echo "status=$STATUS" >> "$GITHUB_OUTPUT"
+
+      - name: Create back-merge pull request
+        if: |
+          steps.existing-pr.outputs.count == '0' &&
+          steps.changes.outputs.status != 'identical'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --repo "${{ github.repository }}" \
+            --base staging \
+            --head main \
+            --title "Back merge main into staging" \
+            --body "Automatische back-merge PR om wijzigingen uit main terug te brengen naar staging."
