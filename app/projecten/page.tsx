@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { client } from "../../sanity/lib/client";
@@ -26,6 +27,7 @@ type ProjectSummary = {
   slug: string;
   assignment: string;
   clientLogo?: string;
+  thumbnail?: string;
 };
 
 export default async function ProjectsPage() {
@@ -75,10 +77,26 @@ export default async function ProjectsPage() {
                   <li key={project._id}>
                     <Link
                       href={`/projecten/${project.slug}`}
-                      className="bg-sirra-taupe-light group flex min-h-72 flex-col rounded-[2rem] p-8 transition-transform duration-300 hover:-translate-y-1 sm:p-10"
+                      className="bg-sirra-taupe-light group block overflow-hidden rounded-[2rem] transition-transform duration-300 hover:-translate-y-1"
                     >
-                      <div className="flex items-start justify-between gap-6">
-                        <p className="text-sirra-gold text-sm font-semibold">
+                      <div className="relative aspect-[4/3] overflow-hidden bg-stone-200">
+                        <Image
+                          src={
+                            project.thumbnail ??
+                            `https://placehold.co/1000x750/${index % 2 ? "c7b49d" : "b9c5bb"}/173b2b/png?text=Project+${index + 1}`
+                          }
+                          alt={
+                            project.thumbnail
+                              ? `Projectafbeelding voor ${project.title}`
+                              : `Tijdelijke projectafbeelding voor ${project.title}`
+                          }
+                          fill
+                          priority={index === 0}
+                          loading={index === 0 ? "eager" : "lazy"}
+                          sizes="(min-width: 640px) 45vw, 90vw"
+                          className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                        />
+                        <p className="text-sirra-gold absolute top-6 left-6 text-sm font-semibold">
                           0{index + 1}
                         </p>
                         {project.clientLogo ? (
@@ -90,11 +108,11 @@ export default async function ProjectsPage() {
                                 ? `Logo van ${project.clientName}`
                                 : "Klantlogo"
                             }
-                            className="h-10 max-w-32 object-contain object-right"
+                            className="absolute right-5 bottom-5 h-14 max-w-40 rounded-2xl bg-white/95 object-contain object-right p-3 shadow-sm"
                           />
                         ) : null}
                       </div>
-                      <div className="mt-auto pt-12">
+                      <div className="p-8 sm:p-10">
                         {project.clientName ? (
                           <p className="eyebrow">{project.clientName}</p>
                         ) : null}

@@ -12,7 +12,6 @@ import { SiteHeader } from "../../components/SiteHeader";
 type Project = {
   title: string;
   clientName?: string;
-  clientLogo?: string;
   assignment: string;
   role: string;
   result: string;
@@ -71,7 +70,7 @@ export default async function ProjectPage({
             >
               Terug naar projecten
             </Link>
-            <div className="mt-14 flex flex-col items-start justify-between gap-8 sm:flex-row">
+            <div className="mt-14">
               <div>
                 {project.clientName ? (
                   <p className="eyebrow">{project.clientName}</p>
@@ -80,18 +79,6 @@ export default async function ProjectPage({
                   {project.title}
                 </h1>
               </div>
-              {project.clientLogo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={project.clientLogo}
-                  alt={
-                    project.clientName
-                      ? `Logo van ${project.clientName}`
-                      : "Klantlogo"
-                  }
-                  className="h-16 max-w-48 object-contain object-right"
-                />
-              ) : null}
             </div>
           </div>
         </section>
