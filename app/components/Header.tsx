@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ArrowRightIcon } from "./icons/ArrowRightIcon";
 import { HeaderLogo } from "./Logo";
 
 const navigation = [
@@ -41,7 +42,7 @@ export function Header({ showProjects = false }: { showProjects?: boolean }) {
   return (
     <header className="bg-background text-sirra-green border-sirra-taupe/35 relative z-50 border-b">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-        <Link aria-label="SIRRA – naar de homepage" href="/">
+        <Link aria-label="SIRRA - naar de homepage" href="/">
           <HeaderLogo />
         </Link>
 
@@ -105,12 +106,7 @@ export function Header({ showProjects = false }: { showProjects?: boolean }) {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.label}
-                  <span
-                    aria-hidden="true"
-                    className="transition-transform duration-300 group-hover:translate-x-1 lg:hidden"
-                  >
-                    →
-                  </span>
+                  <ArrowRightIcon className="size-5 transition-transform duration-300 group-hover:translate-x-1 lg:hidden" />
                 </Link>
               </li>
             ))}

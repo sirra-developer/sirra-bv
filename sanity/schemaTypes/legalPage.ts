@@ -1,55 +1,73 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
+import { DetailBlocksInput } from "../components/DetailBlocksArrayFunctions";
 
-const textBlock = (
-  name: string,
-  title: string,
-  fieldTitle: string,
-  type: "string" | "text" = "string",
-) =>
-  defineArrayMember({
-    name,
-    title,
-    type: "object",
-    fields: [
-      defineField({
-        name: "text",
-        title: fieldTitle,
-        type,
-        rows: type === "text" ? 7 : undefined,
-        validation: (rule) => rule.required(),
-      }),
-    ],
-    preview: {
-      select: { title: "text" },
-      prepare: ({ title: previewTitle }) => ({
-        title: previewTitle,
-        subtitle: title,
-      }),
-    },
-  });
+const legalTextBlock = defineArrayMember({
+  name: "legalTextBlock",
+  title: "Tekst",
+  type: "object",
+  fields: [
+    defineField({
+      name: "content",
+      title: "Tekst",
+      type: "array",
+      validation: (rule) => rule.required(),
+      of: [
+        defineArrayMember({
+          type: "block",
+          styles: [
+            { title: "Normale tekst", value: "normal" },
+            { title: "Titel", value: "h2" },
+            { title: "Subtitel", value: "h3" },
+          ],
+          lists: [
+            { title: "Bulletpoints", value: "bullet" },
+            { title: "Genummerde lijst", value: "number" },
+          ],
+          marks: {
+            decorators: [
+              { title: "Vet", value: "strong" },
+              { title: "Cursief", value: "em" },
+            ],
+            annotations: [
+              defineArrayMember({
+                name: "link",
+                title: "Link",
+                type: "object",
+                fields: [
+                  defineField({
+                    name: "href",
+                    title: "URL",
+                    type: "url",
+                    validation: (rule) =>
+                      rule.uri({
+                        allowRelative: true,
+                        scheme: ["http", "https", "mailto", "tel"],
+                      }),
+                  }),
+                ],
+              }),
+            ],
+          },
+        }),
+      ],
+    }),
+  ],
+  preview: {
+    select: { blocks: "content" },
+    prepare: ({ blocks }) => {
+      const firstBlock = Array.isArray(blocks)
+        ? blocks.find((block) => block?._type === "block")
+        : undefined;
+      const title =
+        firstBlock?.children
+          ?.map((child: { text?: string }) => child.text)
+          .join("")
+          .slice(0, 80) || "Tekst";
 
-const listBlock = (name: string, title: string) =>
-  defineArrayMember({
-    name,
-    title,
-    type: "object",
-    fields: [
-      defineField({
-        name: "items",
-        title: "Punten",
-        type: "array",
-        of: [{ type: "string" }],
-        validation: (rule) => rule.required().min(1),
-      }),
-    ],
-    preview: {
-      select: { items: "items" },
-      prepare: ({ items }) => ({
-        title: Array.isArray(items) ? `${items.length} punten` : title,
-        subtitle: title,
-      }),
+      return { title, subtitle: "Tekst" };
     },
-  });
+  },
+});
 
 export const legalPage = defineType({
   name: "legalPage",
@@ -71,14 +89,34 @@ export const legalPage = defineType({
     defineField({
       name: "blocks",
       title: "Inhoud",
-      description: "Voeg blokken toe en sleep ze naar de gewenste volgorde.",
+      description:
+        "Bouw de pagina op in volgorde: voeg tekst toe om te schrijven en plaats afbeeldingen ertussen waar ze moeten verschijnen.",
       type: "array",
+      components: {
+        input: DetailBlocksInput,
+      },
       of: [
-        textBlock("legalTitle", "Titel", "Titel"),
-        textBlock("legalSubtitle", "Subtitel", "Subtitel"),
-        textBlock("legalParagraph", "Paragraaf", "Tekst", "text"),
-        listBlock("legalBulletList", "Bulletlijst"),
-        listBlock("legalNumberedList", "Genummerde lijst"),
+        legalTextBlock,
+        defineArrayMember({
+          name: "legalImage",
+          title: "Afbeelding",
+          type: "image",
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: "alt",
+              title: "Alternatieve tekst",
+              description: "Beschrijf kort wat er op de afbeelding te zien is.",
+              type: "string",
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "caption",
+              title: "Bijschrift (optioneel)",
+              type: "string",
+            }),
+          ],
+        }),
       ],
       validation: (rule) => rule.required().min(1),
     }),

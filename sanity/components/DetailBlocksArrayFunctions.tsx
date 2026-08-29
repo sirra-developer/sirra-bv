@@ -53,7 +53,12 @@ export function DetailBlocksArrayFunctions({
   readOnly,
   schemaType,
 }: DetailBlocksArrayFunctionsProps) {
-  const addItem = (typeName: "projectTextBlock" | "projectImage") => {
+  const textType = schemaType.of.find((type) =>
+    type.name.endsWith("TextBlock"),
+  );
+  const imageType = schemaType.of.find((type) => type.name.endsWith("Image"));
+
+  const addItem = (typeName: string) => {
     const itemType = schemaType.of.find(
       (type: SchemaType) => type.name === typeName,
     );
@@ -68,18 +73,18 @@ export function DetailBlocksArrayFunctions({
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem" }}>
       <button
-        disabled={readOnly}
-        onClick={() => addItem("projectTextBlock")}
-        style={readOnly ? disabledButtonStyle : buttonStyle}
+        disabled={readOnly || !textType}
+        onClick={() => textType && addItem(textType.name)}
+        style={readOnly || !textType ? disabledButtonStyle : buttonStyle}
         type="button"
       >
         <PlusIcon />
         Tekst toevoegen
       </button>
       <button
-        disabled={readOnly}
-        onClick={() => addItem("projectImage")}
-        style={readOnly ? disabledButtonStyle : buttonStyle}
+        disabled={readOnly || !imageType}
+        onClick={() => imageType && addItem(imageType.name)}
+        style={readOnly || !imageType ? disabledButtonStyle : buttonStyle}
         type="button"
       >
         <PlusIcon />

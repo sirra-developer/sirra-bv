@@ -52,5 +52,5 @@ export const EMPLOYEES_QUERY = defineQuery(
   `*[_type=="employee"]|order(lastName asc,firstName asc){_id,firstName,lastName,role,biography,linkedinUrl,"employeePicture":employeePicture.asset->url,phoneNumber,email}`,
 );
 export const LEGAL_PAGE_QUERY = defineQuery(
-  `*[_type=="legalPage" && _id==$id][0]{pageTitle,intro,blocks}`,
+  `*[_type=="legalPage" && _id==$id][0]{pageTitle,intro,blocks[]{..., _type=="legalTextBlock"=>{_key,_type,content}, _type=="legalImage"=>{_key,_type,alt,caption,"url":asset->url}}}`,
 );
