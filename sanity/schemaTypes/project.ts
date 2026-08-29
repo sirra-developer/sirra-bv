@@ -1,4 +1,5 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
+import { DetailBlocksInput } from "../components/DetailBlocksArrayFunctions";
 
 const projectTextBlock = defineArrayMember({
   name: "projectTextBlock",
@@ -131,6 +132,9 @@ export const project = defineType({
       description:
         "Bouw de detailpagina op in volgorde: voeg tekst toe om te schrijven en plaats afbeeldingen ertussen waar ze moeten verschijnen.",
       type: "array",
+      components: {
+        input: DetailBlocksInput,
+      },
       of: [
         projectTextBlock,
         defineArrayMember({
