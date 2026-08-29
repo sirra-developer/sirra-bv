@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PortableText } from "next-sanity";
-import { fetchSanity } from "../../../sanity/lib/live";
+import { client } from "../../../sanity/lib/client";
 import {
   PROJECT_QUERY,
   PROJECTS_VISIBILITY_QUERY,
@@ -136,8 +136,8 @@ export default async function ProjectPage({
   let visible = false;
   try {
     [visible, project] = await Promise.all([
-      fetchSanity<boolean>(PROJECTS_VISIBILITY_QUERY),
-      fetchSanity<Project | null>(PROJECT_QUERY, { slug }),
+      client.fetch<boolean>(PROJECTS_VISIBILITY_QUERY),
+      client.fetch<Project | null>(PROJECT_QUERY, { slug }),
     ]);
   } catch {
     notFound();
