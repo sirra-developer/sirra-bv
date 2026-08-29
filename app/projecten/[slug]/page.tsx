@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { client } from "../../../sanity/lib/client";
+import { PortableText } from "next-sanity";
+import { fetchSanity } from "../../../sanity/lib/live";
 import {
   PROJECT_QUERY,
   PROJECTS_VISIBILITY_QUERY,
@@ -32,7 +33,98 @@ type ProjectTextBlock = {
   text: string;
 };
 
-type ProjectDetailBlock = ProjectTextBlock | ProjectImage;
+type ProjectRichTextBlock = {
+  _key: string;
+  _type: "projectTextBlock";
+  content: PortableTextBlock[];
+};
+
+type PortableTextChild = {
+  _key: string;
+  _type: "span";
+  text: string;
+  marks?: string[];
+};
+
+type PortableTextBlock = {
+  _key: string;
+  _type: "block";
+  style?: "normal" | "h2" | "h3";
+  listItem?: "bullet" | "number";
+  level?: number;
+  markDefs?: Array<{
+    _key: string;
+    _type: "link";
+    href?: string;
+  }>;
+  children?: PortableTextChild[];
+};
+
+type ProjectDetailBlock =
+  ProjectTextBlock | ProjectRichTextBlock | ProjectImage;
+
+const portableTextComponents = {
+  block: {
+    h2: ({ children }: { children?: React.ReactNode }) => (
+      <h2 className="text-sirra-green mt-14 text-4xl font-semibold tracking-[-0.04em] text-balance first:mt-0">
+        {children}
+      </h2>
+    ),
+    h3: ({ children }: { children?: React.ReactNode }) => (
+      <h3 className="text-sirra-green mt-10 text-2xl font-semibold tracking-[-0.03em] text-balance">
+        {children}
+      </h3>
+    ),
+    normal: ({ children }: { children?: React.ReactNode }) => (
+      <p className="mt-5 max-w-[70ch] text-lg leading-8 text-stone-600">
+        {children}
+      </p>
+    ),
+  },
+  list: {
+    bullet: ({ children }: { children?: React.ReactNode }) => (
+      <ul className="mt-5 max-w-[70ch] list-disc space-y-3 pl-6 text-lg leading-8 text-stone-600">
+        {children}
+      </ul>
+    ),
+    number: ({ children }: { children?: React.ReactNode }) => (
+      <ol className="mt-5 max-w-[70ch] list-decimal space-y-3 pl-6 text-lg leading-8 text-stone-600">
+        {children}
+      </ol>
+    ),
+  },
+  listItem: {
+    bullet: ({ children }: { children?: React.ReactNode }) => (
+      <li className="pl-1">{children}</li>
+    ),
+    number: ({ children }: { children?: React.ReactNode }) => (
+      <li className="pl-1">{children}</li>
+    ),
+  },
+  marks: {
+    link: ({
+      children,
+      value,
+    }: {
+      children?: React.ReactNode;
+      value?: { href?: string };
+    }) => {
+      const href = value?.href || "#";
+      const isExternal = /^https?:\/\//.test(href);
+
+      return (
+        <a
+          href={href}
+          target={isExternal ? "_blank" : undefined}
+          rel={isExternal ? "noreferrer" : undefined}
+          className="text-sirra-green decoration-sirra-gold hover:text-sirra-gold font-semibold underline decoration-2 underline-offset-4 transition"
+        >
+          {children}
+        </a>
+      );
+    },
+  },
+};
 
 export default async function ProjectPage({
   params,
@@ -44,8 +136,8 @@ export default async function ProjectPage({
   let visible = false;
   try {
     [visible, project] = await Promise.all([
-      client.fetch<boolean>(PROJECTS_VISIBILITY_QUERY),
-      client.fetch<Project | null>(PROJECT_QUERY, { slug }),
+      fetchSanity<boolean>(PROJECTS_VISIBILITY_QUERY),
+      fetchSanity<Project | null>(PROJECT_QUERY, { slug }),
     ]);
   } catch {
     notFound();
@@ -136,6 +228,16 @@ export default async function ProjectPage({
                     >
                       {block.text}
                     </p>
+                  );
+                }
+                if (block._type === "projectTextBlock") {
+                  return (
+                    <div key={block._key}>
+                      <PortableText
+                        value={block.content}
+                        components={portableTextComponents}
+                      />
+                    </div>
                   );
                 }
                 if (block._type !== "projectImage" || !block.url) return null;

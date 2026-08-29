@@ -46,7 +46,7 @@ export const LATEST_PROJECTS_QUERY = defineQuery(
   `*[_type=="project" && defined(slug.current)]|order(_createdAt desc)[0...2]{_id,title,clientName,"slug":slug.current,assignment,"thumbnail":thumbnail.asset->url}`,
 );
 export const PROJECT_QUERY = defineQuery(
-  `*[_type=="project" && slug.current==$slug][0]{title,clientName,assignment,role,result,detailBlocks[]{..., _type=="projectImage"=>{"url":asset->url}}}`,
+  `*[_type=="project" && slug.current==$slug][0]{title,clientName,assignment,role,result,detailBlocks[]{..., _type=="projectTextBlock"=>{_key,_type,content}, _type=="projectImage"=>{_key,_type,alt,caption,"url":asset->url}}}`,
 );
 export const EMPLOYEES_QUERY = defineQuery(
   `*[_type=="employee"]|order(lastName asc,firstName asc){_id,firstName,lastName,role,biography,linkedinUrl,"employeePicture":employeePicture.asset->url,phoneNumber,email}`,
