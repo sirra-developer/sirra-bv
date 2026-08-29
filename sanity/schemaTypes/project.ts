@@ -1,5 +1,73 @@
 import { defineArrayMember, defineField, defineType } from "sanity";
 
+const projectTextBlock = defineArrayMember({
+  name: "projectTextBlock",
+  title: "Tekst",
+  type: "object",
+  fields: [
+    defineField({
+      name: "content",
+      title: "Tekst",
+      type: "array",
+      validation: (rule) => rule.required(),
+      of: [
+        defineArrayMember({
+          type: "block",
+          styles: [
+            { title: "Normale tekst", value: "normal" },
+            { title: "Titel", value: "h2" },
+            { title: "Subtitel", value: "h3" },
+          ],
+          lists: [
+            { title: "Bulletpoints", value: "bullet" },
+            { title: "Genummerde lijst", value: "number" },
+          ],
+          marks: {
+            decorators: [
+              { title: "Vet", value: "strong" },
+              { title: "Cursief", value: "em" },
+            ],
+            annotations: [
+              defineArrayMember({
+                name: "link",
+                title: "Link",
+                type: "object",
+                fields: [
+                  defineField({
+                    name: "href",
+                    title: "URL",
+                    type: "url",
+                    validation: (rule) =>
+                      rule.uri({
+                        allowRelative: true,
+                        scheme: ["http", "https", "mailto", "tel"],
+                      }),
+                  }),
+                ],
+              }),
+            ],
+          },
+        }),
+      ],
+    }),
+  ],
+  preview: {
+    select: { blocks: "content" },
+    prepare: ({ blocks }) => {
+      const firstBlock = Array.isArray(blocks)
+        ? blocks.find((block) => block?._type === "block")
+        : undefined;
+      const title =
+        firstBlock?.children
+          ?.map((child: { text?: string }) => child.text)
+          .join("")
+          .slice(0, 80) || "Tekst";
+
+      return { title, subtitle: "Tekst" };
+    },
+  },
+});
+
 export const project = defineType({
   name: "project",
   title: "Projecten",
@@ -61,64 +129,13 @@ export const project = defineType({
       name: "detailBlocks",
       title: "Verdiepend projectverhaal (optioneel)",
       description:
-        "Bouw de detailpagina op met losse titels, subtitels, paragrafen en foto’s.",
+        "Bouw de detailpagina op in volgorde: voeg tekst toe om te schrijven en plaats afbeeldingen ertussen waar ze moeten verschijnen.",
       type: "array",
       of: [
-        defineArrayMember({
-          name: "projectTitle",
-          title: "Titel",
-          type: "object",
-          fields: [
-            defineField({
-              name: "text",
-              title: "Titel",
-              type: "string",
-              validation: (rule) => rule.required(),
-            }),
-          ],
-          preview: {
-            select: { title: "text" },
-            prepare: ({ title }) => ({ title, subtitle: "Titel" }),
-          },
-        }),
-        defineArrayMember({
-          name: "projectSubtitle",
-          title: "Subtitel",
-          type: "object",
-          fields: [
-            defineField({
-              name: "text",
-              title: "Subtitel",
-              type: "string",
-              validation: (rule) => rule.required(),
-            }),
-          ],
-          preview: {
-            select: { title: "text" },
-            prepare: ({ title }) => ({ title, subtitle: "Subtitel" }),
-          },
-        }),
-        defineArrayMember({
-          name: "projectParagraph",
-          title: "Paragraaf",
-          type: "object",
-          fields: [
-            defineField({
-              name: "text",
-              title: "Tekst",
-              type: "text",
-              rows: 6,
-              validation: (rule) => rule.required(),
-            }),
-          ],
-          preview: {
-            select: { title: "text" },
-            prepare: ({ title }) => ({ title, subtitle: "Paragraaf" }),
-          },
-        }),
+        projectTextBlock,
         defineArrayMember({
           name: "projectImage",
-          title: "Foto",
+          title: "Afbeelding",
           type: "image",
           options: { hotspot: true },
           fields: [
