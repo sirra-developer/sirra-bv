@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DiagonalArrowIcon } from "../icons/DiagonalArrowIcon";
 import type { HomePageContent } from "./types";
 
 export function HomeFocusAreas({ content }: { content: HomePageContent }) {
@@ -29,12 +30,7 @@ export function HomeFocusAreas({ content }: { content: HomePageContent }) {
               <h3 className="text-lg font-semibold transition-transform duration-300 ease-out group-hover:translate-x-2 sm:text-xl">
                 {item.title}
               </h3>
-              <span
-                aria-hidden
-                className="text-xl transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:-translate-y-1"
-              >
-                ↗
-              </span>
+              <DiagonalArrowIcon className="size-5 transition-transform duration-300 ease-out group-hover:translate-x-1 group-hover:-translate-y-1" />
             </Link>
           ))}
         </div>
