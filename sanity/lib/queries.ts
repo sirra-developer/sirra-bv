@@ -31,7 +31,7 @@ export const CONTACT_PAGE_QUERY = defineQuery(`{
  "intro": *[_type=="contactIntro" && _id=="contactIntro" && contentVersion=="1.6"][0]{heading,introduction},
  "details": *[_type=="contactDetails" && _id=="contactDetailsV4" && contentVersion=="1.6"][0]{heading,email,whatsappPhone,address{street,houseNumber,postalCode,city},chamberOfCommerce,linkedinUrl},
  "form": *[_type=="contactForm" && _id=="contactFormV2" && contentVersion=="1.6"][0]{heading,action,responseText,fields[]{_key,label,inputType,required,placeholder}}
- ,"map": *[_type=="contactMap" && _id=="contactMap" && contentVersion=="1.6"][0]{heading}
+ ,"map": *[_type=="contactMap" && _id=="contactMap" && contentVersion=="1.6"][0]{heading,address{street,houseNumber,postalCode,city}}
 }`);
 export const PROJECTS_QUERY = defineQuery(
   `*[_type=="project" && defined(slug.current)]|order(title asc){_id,title,clientName,"slug":slug.current,assignment,role,result,"clientLogo":clientLogo.asset->url,"thumbnail":thumbnail.asset->url}`,

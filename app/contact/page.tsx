@@ -61,8 +61,36 @@ const fallback = {
   },
   map: {
     heading: "Ons kantoor",
+    address: undefined as
+      | {
+          street: string;
+          houseNumber: string;
+          postalCode: string;
+          city: string;
+        }
+      | undefined,
   },
 };
+
+type ContactAddress = {
+  street?: string;
+  houseNumber?: string;
+  postalCode?: string;
+  city?: string;
+};
+
+function formatAddress(address?: ContactAddress) {
+  if (
+    !address?.street ||
+    !address.houseNumber ||
+    !address.postalCode ||
+    !address.city
+  ) {
+    return "";
+  }
+
+  return `${address.street} ${address.houseNumber}, ${address.postalCode} ${address.city}`;
+}
 
 async function getContent() {
   if (!isSanityConfigured) return fallback;
@@ -81,10 +109,8 @@ async function getContent() {
 
 export default async function ContactPage() {
   const content = await getContent();
-  const address = content.details.address;
-  const formattedAddress = address
-    ? `${address.street} ${address.houseNumber}, ${address.postalCode} ${address.city}`
-    : "";
+  const formattedAddress = formatAddress(content.details.address);
+  const mapAddress = formatAddress(content.map.address) || formattedAddress;
   return (
     <div className="bg-background text-foreground min-h-screen overflow-hidden">
       <SiteHeader />
@@ -95,11 +121,8 @@ export default async function ContactPage() {
             details={{ ...content.details, address: formattedAddress }}
           />
           <ContactForm content={content.form} />
-          {formattedAddress ? (
-            <ContactMap
-              address={formattedAddress}
-              heading={content.map.heading}
-            />
+          {mapAddress ? (
+            <ContactMap address={mapAddress} heading={content.map.heading} />
           ) : null}
         </SectionAnimations>
       </main>

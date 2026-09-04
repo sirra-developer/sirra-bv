@@ -220,8 +220,46 @@ export const contactMap = defineType({
   initialValue: {
     contentVersion: "1.6",
     heading: "Ons kantoor",
+    address: {
+      _type: "contactMapAddress",
+      street: "Naritaweg",
+      houseNumber: "127-137",
+      postalCode: "1043 BS",
+      city: "Amsterdam",
+    },
   },
-  fields: [version, requiredString("heading", "Titel voor de kaart")],
+  fields: [
+    version,
+    requiredString("heading", "Titel voor de kaart"),
+    defineField({
+      name: "address",
+      title: "Kaartadres",
+      description:
+        "Laat leeg om het bezoekadres uit Contactgegevens te gebruiken.",
+      type: "object",
+      initialValue: {
+        street: "Naritaweg",
+        houseNumber: "127-137",
+        postalCode: "1043 BS",
+        city: "Amsterdam",
+      },
+      fields: [
+        requiredString("street", "Straatnaam"),
+        requiredString("houseNumber", "Huisnummer"),
+        defineField({
+          name: "postalCode",
+          title: "Postcode",
+          type: "string",
+          validation: (rule) =>
+            rule.regex(/^\d{4}\s?[A-Za-z]{2}$/, {
+              name: "Nederlandse postcode",
+              invert: false,
+            }),
+        }),
+        requiredString("city", "Stad"),
+      ],
+    }),
+  ],
   preview: { prepare: () => ({ title: "Kaart" }) },
 });
 
